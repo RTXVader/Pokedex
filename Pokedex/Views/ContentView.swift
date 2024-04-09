@@ -9,17 +9,35 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject var vm = ViewModel()
+    
+    private let adaptiveColumns = [
+        GridItem(.adaptive(minimum: 150))
+    ]
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationView {
+            ScrollView {
+                LazyVGrid(columns: adaptiveColumns, spacing: 10) {
+                    ForEach(vm.filteredPokemon) { pokemon in
+                        NavigationLink(destination: PokemonDetailView(pokemon: pokemon)
+                        ) {
+                            PokemonView(pokemon: pokemon)
+                        }
+                    }
+                }
+                .animation(.easeInOut(duration: 0.3), value: vm.filteredPokemon.count)
+                .navigationTitle("Pokedex 151")
+                .navigationBarTitleDisplayMode(.inline)
+            }
+            .searchable(text: $vm.searchText)
         }
-        .padding()
+        .environmentObject(vm)
     }
 }
 
-#Preview {
-    ContentView()
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }
